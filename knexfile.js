@@ -8,9 +8,10 @@ module.exports = {
   development: {
     client: 'postgresql',
     connection: {
-      database: 'caphill_coffee_api',
+      database: 'nicole',
       user:     'postgres',
-      password: 'postgres'
+      host: 'localhost',
+      port: 5432
     },
     pool: {
       min: 2,
