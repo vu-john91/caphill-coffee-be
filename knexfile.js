@@ -7,12 +7,7 @@ module.exports = {
 
   development: {
     client: 'postgresql',
-    connection: {
-      database: 'nicole',
-      user:     'postgres',
-      host: 'localhost',
-      port: 5432
-    },
+    connection: 'postgress://localhost/coffee_shop_db',
     pool: {
       min: 2,
       max: 10
@@ -40,3 +35,10 @@ module.exports = {
   }
 
 };
+
+// {
+//   database: 'coffee_shop_db',
+//   user:     'postgres',
+//   host: 'localhost',
+//   port: 5432
+// },

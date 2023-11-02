@@ -4,6 +4,7 @@ const cors = require('cors')
 const knex = require('knex')
 const config = require('./knexfile')[process.env.NODE_ENV || 'development']
 const database = knex(config)
+const queries = require('./queries')
 
 app.set('port', 3001)
 
@@ -15,15 +16,21 @@ app.use(express.json());
 //rename pathData to something more specific
 //don't need async
 //fix this
-app.get('/api/v1/pathData', (request, response) => {
-  const pathData = database.select().from('coffee_shop_data')
-  .then(pathData => {
-    response.status(200).json(pathData)
-  })
-  .catch(error => {
-    response.status(500).json({message: error.message })
-  })
+
+app.get('/', (request, response) => {
+  queries.getAll().then(results => response.send(results))
 })
+
+
+// app.get('/api/v1/pathData', (request, response) => {
+//   const pathData = database.select().from('coffee_shop_data')
+//   .then(pathData => {
+//     response.status(200).json(pathData)
+//   })
+//   .catch(error => {
+//     response.status(500).json({message: error.message })
+//   })
+// })
 
 
 //will need another GET, to get a specific object based on it's ID. 
