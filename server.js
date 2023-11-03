@@ -21,17 +21,9 @@ app.use(express.json());
 //don't need async
 //fix this
 
-// Uncomment and update this GET route
-app.get('/api/v1/', (request, response) => {
-  database.select().from('caphill_coffee_shops')
-    .then(data => {
-      response.status(200).json(data);
-    })
-    .catch(error => {
-      response.status(500).json({ error: error.message });
-    });
-});
-
+app.get('/', (request, response) => {
+  queries.getAll().then(results => response.send(results))
+})
 
 
 // app.get('/api/v1/pathData', (request, response) => {
@@ -50,31 +42,68 @@ app.get('/api/v1/', (request, response) => {
 //do an app.post here --> tell it which route to hit
 //api/v1/pathdata/coffeeshops:id
 
-app.post('api/v1/SelectedShop/:id', (request, response) => {
-  const { id } = request.params; // assuming you pass the id in the URL
-  const updates = request.body;
+app.post('/SelectedShop/:id', async (request, response) => {
+  const { ratingKey } = request.body;
+  const { id } = request.params; // Get the ID from the URL parameters
 
-  database('caphill_coffee_shops')
-    .where({ id: id })
-    .update(updates)
-    .returning(['id', 'rating']) // whatever fields you want to return
-    .then((updatedRecords) => {
-      response.json(updatedRecords);
-    })
-    .catch((error) => {
-      response.status(500).json({ error });
-    });
+  // Validate the ratingKey sent in the body
+  if (!['thumbsUp', 'thumbsDown'].includes(ratingKey)) {
+    return response.status(400).json({ error: 'Invalid rating key' });
+  }
+
+  try {
+    // Find the coffee shop by ID
+    const coffeeShop = await database('caphill_coffee_shops').where({ id }).first();
+    if (!coffeeShop) {
+      return response.status(404).json({ error: 'Coffee shop not found' });
+    }
+
+    // Update the rating count for thumbsUp or thumbsDown
+    const updatedRating = coffeeShop.rating[ratingKey] + 1;
+    const updateResult = await database('caphill_coffee_shops')
+      .where({ id })
+      .update({
+        rating: {
+          ...coffeeShop.rating,
+          [ratingKey]: updatedRating
+        }
+      }, ['id', 'rating']);
+
+    // Send back the updated coffee shop data
+    console.log("Server Response:", updateResult);
+
+    response.json(updateResult[0]);
+  } catch (error) {
+    console.error('Error updating coffee shop rating:', error);
+    response.status(500).json({ error: 'Internal server error' });
+  }
 });
 
+
+// app.post('/api/v1/pathData/:id', (request, response) => {
+//   const params = request.body;
+//   knex('coffee_shop_data')
+//     .where({ id: params.id })
+//     .increment('rating: thumbsUp', 1)
+//       .returning(['id', 'rating'])
+//       .then((updatedRows) => {
+//         response.json(updatedRows)
+//       })
+//       .catch((error) => {
+//         response.status(500).json({ error: 'database update failed'})
+//       })
+//     // .update(
+//     //   {rating: params.rating
+//     //   }, ['id', 'rating'],
+// })
 //figure out how to send the correct response
 //google how to make it more dynamic to update whatever keys we are given in the object. 
 
 
 //routes
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-});
+app.listen(3001, () => {
+  console.log('server has started on port 3001')
+})
 
 // knex('books')
 //   .where({ id: 42 })
