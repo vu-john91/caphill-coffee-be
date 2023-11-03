@@ -3,7 +3,8 @@ const app = express()
 const cors = require('cors')
 const knex = require('knex')
 const config = require('./knexfile')[process.env.NODE_ENV || 'development']
-const database = knex(config)
+const database = knex(config[process.env.NODE_ENV || 'development']);
+
 const queries = require('./queries')
 
 app.set('port', 3001)
@@ -17,9 +18,17 @@ app.use(express.json());
 //don't need async
 //fix this
 
-app.get('/', (request, response) => {
-  queries.getAll().then(results => response.send(results))
-})
+// Uncomment and update this GET route
+app.get('/api/v1/', (request, response) => {
+  database.select().from('coffee_shop_data')
+    .then(data => {
+      response.status(200).json(data);
+    })
+    .catch(error => {
+      response.status(500).json({ error: error.message });
+    });
+});
+
 
 
 // app.get('/api/v1/pathData', (request, response) => {
@@ -38,15 +47,22 @@ app.get('/', (request, response) => {
 //do an app.post here --> tell it which route to hit
 //api/v1/pathdata/coffeeshops:id
 
-app.post('/api/v1/pathData/:id', (request, response) => {
-  const params = request.body;
-  knex('coffee_shop_data')
-    .where({ id: params.id })
-    .update(
-      {rating: params.rating
-      }, ['id', 'rating'],
-    )
-})
+app.post('ap1/v1/SelectedShop/:id', (request, response) => {
+  const { id } = request.params; // assuming you pass the id in the URL
+  const updates = request.body;
+
+  database('coffee_shop_data')
+    .where({ id: id })
+    .update(updates)
+    .returning(['id', 'rating']) // whatever fields you want to return
+    .then((updatedRecords) => {
+      response.json(updatedRecords);
+    })
+    .catch((error) => {
+      response.status(500).json({ error });
+    });
+});
+
 //figure out how to send the correct response
 //google how to make it more dynamic to update whatever keys we are given in the object. 
 
