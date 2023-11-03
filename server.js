@@ -5,8 +5,8 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const knex = require('knex')
-const config = require('./knexfile')[process.env.NODE_ENV || 'development']
-const database = knex(config[process.env.NODE_ENV || 'development']);
+const config = require('./knexfile')['development']
+const database = knex(config['development']);
 
 const queries = require('./queries')
 
@@ -23,7 +23,7 @@ app.use(express.json());
 
 // Uncomment and update this GET route
 app.get('/api/v1/', (request, response) => {
-  database.select().from('coffee_shop_data')
+  database.select().from('caphill_coffee_shops')
     .then(data => {
       response.status(200).json(data);
     })
@@ -50,11 +50,11 @@ app.get('/api/v1/', (request, response) => {
 //do an app.post here --> tell it which route to hit
 //api/v1/pathdata/coffeeshops:id
 
-app.post('ap1/v1/SelectedShop/:id', (request, response) => {
+app.post('api/v1/SelectedShop/:id', (request, response) => {
   const { id } = request.params; // assuming you pass the id in the URL
   const updates = request.body;
 
-  database('coffee_shop_data')
+  database('caphill_coffee_shops')
     .where({ id: id })
     .update(updates)
     .returning(['id', 'rating']) // whatever fields you want to return
