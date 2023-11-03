@@ -18,7 +18,9 @@ const PORT = process.env.PORT || 3001;
 
 
 //middleware
-app.use(cors())
+app.use(cors({
+  origin: 'https://caphill-coffee.vercel.app'
+}));
 
 app.use(express.json());
 
