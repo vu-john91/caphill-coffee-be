@@ -7,7 +7,7 @@ module.exports = {
 
   development: {
     client: 'postgresql',
-    connection: 'postgress://localhost/coffee_shop_db',
+    connection: process.env.DATABASE_URL,
     pool: {
       min: 2,
       max: 10
