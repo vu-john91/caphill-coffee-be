@@ -6,11 +6,16 @@ const app = express()
 const cors = require('cors')
 const knex = require('knex')
 const config = require('./knexfile')['development']
-const database = knex(config['development']);
+const database = knex({
+  client: 'pg',
+  connection: process.env.POSTGRES_URL,
+});
+
 
 const queries = require('./queries')
 
-app.set('port', 3001)
+const PORT = process.env.PORT || 3001;
+
 
 //middleware
 app.use(cors())
@@ -101,9 +106,10 @@ app.post('/SelectedShop/:id', async (request, response) => {
 
 
 //routes
-app.listen(3001, () => {
-  console.log('server has started on port 3001')
-})
+app.listen(PORT, () => {
+  console.log(`server has started on port ${PORT}`);
+});
+
 
 // knex('books')
 //   .where({ id: 42 })
