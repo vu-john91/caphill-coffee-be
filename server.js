@@ -49,21 +49,18 @@ app.get('/', (request, response) => {
 
 app.post('/SelectedShop/:id', async (request, response) => {
   const { ratingKey } = request.body;
-  const { id } = request.params; // Get the ID from the URL parameters
+  const { id } = request.params;
 
-  // Validate the ratingKey sent in the body
   if (!['thumbsUp', 'thumbsDown'].includes(ratingKey)) {
     return response.status(400).json({ error: 'Invalid rating key' });
   }
 
   try {
-    // Find the coffee shop by ID
     const coffeeShop = await database('caphill_coffee_shops').where({ id }).first();
     if (!coffeeShop) {
       return response.status(404).json({ error: 'Coffee shop not found' });
     }
 
-    // Update the rating count for thumbsUp or thumbsDown
     const updatedRating = coffeeShop.rating[ratingKey] + 1;
     const updateResult = await database('caphill_coffee_shops')
       .where({ id })
@@ -74,16 +71,26 @@ app.post('/SelectedShop/:id', async (request, response) => {
         }
       }, ['id', 'rating']);
 
-    // Send back the updated coffee shop data
-    console.log("Server Response:", updateResult);
-
     response.json(updateResult[0]);
   } catch (error) {
-    console.log(ratingKey, id)
+    console.log("Request Details: ", {
+      ratingKey: ratingKey,
+      id: id,
+      requestBody: request.body
+    });
     console.error('Error updating coffee shop rating:', error);
-    response.status(500).json({ error: 'Internal server error' });
+
+    // Sending more specific error details in the response
+    response.status(500).json({
+      error: 'Internal server error',
+      details: {
+        message: error.message,
+        stack: error.stack // This will include the call stack. Be cautious about sending this in a production environment as it may expose details of your code.
+      }
+    });
   }
 });
+
 
 
 // app.post('/api/v1/pathData/:id', (request, response) => {
