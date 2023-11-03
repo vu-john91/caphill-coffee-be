@@ -79,6 +79,7 @@ app.post('/SelectedShop/:id', async (request, response) => {
 
     response.json(updateResult[0]);
   } catch (error) {
+    console.log(ratingKey, id)
     console.error('Error updating coffee shop rating:', error);
     response.status(500).json({ error: 'Internal server error' });
   }
