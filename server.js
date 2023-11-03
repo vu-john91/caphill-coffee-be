@@ -26,7 +26,7 @@ app.use(express.json());
 //don't need async
 //fix this
 
-app.get('/', (request, response) => {
+app.get('https://caphill-coffee-be.vercel.app/', (request, response) => {
   queries.getAll().then(results => response.send(results))
 })
 
@@ -47,7 +47,7 @@ app.get('/', (request, response) => {
 //do an app.post here --> tell it which route to hit
 //api/v1/pathdata/coffeeshops:id
 
-app.post('/SelectedShop/:id', async (request, response) => {
+app.post('https://caphill-coffee-be.vercel.app//SelectedShop/:id', async (request, response) => {
   const { ratingKey } = request.body;
   const { id } = request.params; // Get the ID from the URL parameters
 
