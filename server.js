@@ -8,7 +8,10 @@ const knex = require('knex')
 const config = require('./knexfile')['development']
 const database = knex({
   client: 'pg',
-  connection: process.env.POSTGRES_URL,
+  connection: {
+    connectionString: process.env.POSTGRES_URL,
+    ssl: { rejectUnauthorized: false }
+  },
 });
 
 
